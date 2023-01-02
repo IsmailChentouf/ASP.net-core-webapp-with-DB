@@ -50,13 +50,28 @@ stages:
         arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)'
         zipAfterPublish: True
 
+    - task: SonarCloudPrepare@1
+      displayName: Prepare Sonar cloud analysis
+      inputs:
+        SonarCloud: 'sonarr'
+        organization: 'ravirajput'
+        scannerMode: 'MSBuild'
+        projectKey: 'ravirajput_ASP.net-webapp-with-DB'
+        projectName: 'ASP.net webapp with DB'
+    
+    - task: SonarCloudAnalyze@1
+      displayName: 'Run Code Analysis on SonarCloud' 
+    
+    - task: SonarCloudPublish@1
+      displayName: 'Publish Quality Gate Result on SonarCloud'
+      inputs:
+        pollingTimeoutSec: '300'
+
     - task: PublishPipelineArtifact@0
       displayName: 'Publish pipeline artifacts'
       inputs:
         targetPath: $(Build.ArtifactStagingDirectory)
         artifactName: 'Webapp'
-        
-    
 
 - stage: Deploy
   displayName: Deployment
@@ -77,7 +92,6 @@ stages:
             inputs:
               artifactName: 'Webapp'
               targetPath: $(System.ArtifactsDirectory)
-
           
           - task: AzureWebApp@1
             displayName: 'Azure Web App Deploy: $(webAppName)-webapp'
