@@ -1,0 +1,1 @@
+Sample .net core web app used for CI/CD using Azure DevOps and deploying to Azure App Service.
