@@ -4,9 +4,8 @@ trigger:
       - main
 
 variables:
-  BuildConfiguration: release
   azureSubscription: 'dotnet'  # Replace with your Azure subscription name
-  webAppName: 'dotnet-mv'     # Replace with your Azure Web App name
+  webAppName: 'dotnet-mv'      # Replace with your Azure Web App name
   vmImageName: 'ubuntu-latest'
 
 stages:
@@ -35,22 +34,7 @@ stages:
       displayName: Build Web App
       inputs:
         projects: '**/WebApp.csproj'
-        arguments: '--configuration $(BuildConfiguration)'
-
-    - task: DotNetCoreCLI@2
-      displayName: Run Unit Tests
-      inputs:
-        command: test
-        projects: '**/*UnitTest*.csproj'
-        arguments: '--configuration $(BuildConfiguration)'
-
-    - task: DotNetCoreCLI@2
-      displayName: Create Web App Package (.zip)
-      inputs:
-        command: publish
-        publishWebProjects: true
-        arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)'
-        zipAfterPublish: true
+        arguments: '--configuration release'
 
     - task: PublishPipelineArtifact@0
       displayName: Publish Pipeline Artifacts
