@@ -44,7 +44,7 @@ stages:
 
 - stage: Deploy
   displayName: Deployment
-  dependsOn: Build
+  dependsOn: Build  # Ensures that Deploy stage only runs after Build stage is successful
   condition: succeeded()
   jobs:
   - deployment: DeployLinuxWebApp
