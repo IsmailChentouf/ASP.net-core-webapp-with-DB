@@ -1,8 +1,10 @@
 trigger:
-  branches:
-    include:
-      - main
+- master
 
+pool:
+  name: Default
+  demands:
+    - Agent.Name -equals BIGIII
 variables:
   azureSubscription: 'dotnet'  # Replace with your Azure subscription name
   webAppName: 'dotnet-mv'      # Replace with your Azure Web App name
@@ -14,8 +16,6 @@ stages:
   jobs:
   - job: buildArtifacts
     displayName: Build Artifacts
-    pool:
-      name: IsmailAgent  # Specify the agent pool here
     steps:
     - task: UseDotNet@2
       displayName: Install .NET 6 SDK
@@ -41,31 +41,3 @@ stages:
       inputs:
         targetPath: $(Build.ArtifactStagingDirectory)
         artifactName: Webapp
-
-- stage: Deploy
-  displayName: Deployment
-  dependsOn: Build  # Ensures that Deploy stage only runs after Build stage is successful
-  condition: succeeded()
-  jobs:
-  - deployment: DeployLinuxWebApp
-    displayName: Deploy Linux Web App
-    environment: 'development'
-    pool:
-      name: IsmailAgent  # Use the same agent pool for the deploy stage
-    strategy:
-      runOnce:
-        deploy:
-          steps:
-          - task: DownloadPipelineArtifact@2
-            displayName: Download Pipeline Artifact
-            inputs:
-              artifactName: Webapp
-              targetPath: $(System.ArtifactsDirectory)
-
-          - task: AzureWebApp@1
-            displayName: Azure Web App Deploy
-            inputs:
-              azureSubscription: $(azureSubscription)
-              appType: webAppLinux
-              appName: $(webAppName)
-              package: '$(System.ArtifactsDirectory)/*.zip'
